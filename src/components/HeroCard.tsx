@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Heart, Info, ExternalLink, Zap, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -55,14 +54,14 @@ const HeroCard = ({ character, isFavorite, onToggleFavorite, onShowDetails }: He
       <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       
-      <div className="relative h-80 overflow-hidden">
+      <div className="relative min-h-80 overflow-hidden">
         {/* Imagen con efectos mejorados */}
         {isValidImage && !imageError ? (
           <>
             <img
               src={imageUrl}
               alt={character.name}
-              className={`w-full h-full object-cover transition-all duration-700 group-hover:scale-120 ${
+              className={`w-full h-full min-h-80 object-cover transition-all duration-700 group-hover:scale-120 ${
                 imageLoaded ? 'opacity-100' : 'opacity-0'
               }`}
               onLoad={() => setImageLoaded(true)}
@@ -76,7 +75,7 @@ const HeroCard = ({ character, isFavorite, onToggleFavorite, onShowDetails }: He
             </div>
           </>
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-primary/30 via-accent/20 to-secondary/30 flex items-center justify-center relative overflow-hidden">
+          <div className="w-full h-full min-h-80 bg-gradient-to-br from-primary/30 via-accent/20 to-secondary/30 flex items-center justify-center relative overflow-hidden">
             <div className="cyber-grid absolute inset-0 opacity-20"></div>
             <div className="text-center z-10">
               <Shield className="w-16 h-16 text-primary mb-2 animate-pulse mx-auto" />
