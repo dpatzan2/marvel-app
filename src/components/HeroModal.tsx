@@ -269,7 +269,6 @@ const HeroModal = ({ character, isOpen, onClose }: HeroModalProps) => {
 
 export default HeroModal;
 
-// Add this style object or CSS class to your global styles
 const customScrollbarStyles = `
   .scrollbar-hidden {
     scrollbar-width: none; /* Firefox */
