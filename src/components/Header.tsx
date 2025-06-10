@@ -67,7 +67,7 @@ const Header = ({ searchTerm, onSearchChange, favoritesCount, onShowFavorites }:
           </Button>
         </div>
 
-        {/* Mobile Navigation */}
+
         {isMenuOpen && (
           <div className="md:hidden mt-4 space-y-4 animate-slide-in">
             <div className="relative">

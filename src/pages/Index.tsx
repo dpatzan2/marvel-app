@@ -56,11 +56,21 @@ const Index = () => {
   const [favorites, setFavorites] = useState<Character[]>([]);
   const [totalComics, setTotalComics] = useState(0);
   const [totalSeries, setTotalSeries] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   const limit = 20;
   const offset = currentPage * limit;
 
-  // Load favorites from localStorage
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   useEffect(() => {
     const savedFavorites = localStorage.getItem('marvel-favorites');
     if (savedFavorites) {
@@ -68,7 +78,6 @@ const Index = () => {
     }
   }, []);
 
-  // Save favorites to localStorage
   useEffect(() => {
     localStorage.setItem('marvel-favorites', JSON.stringify(favorites));
   }, [favorites]);
@@ -78,8 +87,8 @@ const Index = () => {
     queryFn: async (): Promise<MarvelResponse> => {
       const result = await fetchMarvelCharacters(limit, offset, searchTerm || undefined);
       
-      // Calculate total comics and series
-      if (result.data.results.length > 0) {
+      // Calculate total comics and series (optimized for mobile)
+      if (result.data.results.length > 0 && !isMobile) {
         const comics = result.data.results.reduce((sum: number, char: Character) => sum + char.comics.available, 0);
         const series = result.data.results.reduce((sum: number, char: Character) => sum + char.series.available, 0);
         setTotalComics(prev => prev + comics);
@@ -89,6 +98,7 @@ const Index = () => {
       return result;
     },
     retry: 2,
+    staleTime: isMobile ? 300000 : 60000, // Longer cache on mobile
   });
 
   const handleToggleFavorite = (character: Character) => {
@@ -164,10 +174,13 @@ const Index = () => {
 
       <main className="pt-24 pb-8">
         <div className="container mx-auto px-4">
-          {/* Hero Section */}
+          {/* Optimized Hero Section */}
           <div className="text-center mb-12 animate-slide-in">
-            
-            <h1 className="text-4xl md:text-6xl font-orbitron font-bold mb-4 hero-gradient bg-clip-text text-transparent">
+            <h1 className={`text-4xl md:text-6xl font-orbitron font-bold mb-4 bg-clip-text text-transparent ${
+              isMobile 
+                ? 'bg-gradient-to-r from-primary to-accent' 
+                : 'hero-gradient'
+            }`}>
               MARVEL NEXUS
             </h1>
             
@@ -177,26 +190,28 @@ const Index = () => {
             </p>
           </div>
 
-          {/* Stats */}
-          <StatsCard
-            totalCharacters={data?.data.total || 0}
-            totalFavorites={favorites.length}
-            totalComics={totalComics}
-            totalSeries={totalSeries}
-          />
+          {/* Conditional Stats for performance */}
+          {!isMobile && (
+            <StatsCard
+              totalCharacters={data?.data.total || 0}
+              totalFavorites={favorites.length}
+              totalComics={totalComics}
+              totalSeries={totalSeries}
+            />
+          )}
 
           {/* Loading */}
           {isLoading && <LoadingSpinner />}
 
-          {/* Characters Grid */}
+          {/* Characters Grid with optimized rendering */}
           {!isLoading && characters.length > 0 && (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
                 {characters.map((character, index) => (
                   <div
                     key={character.id}
-                    className="animate-slide-in"
-                    style={{ animationDelay: `${index * 0.05}s` }}
+                    className={`${!isMobile ? 'animate-slide-in' : ''}`}
+                    style={!isMobile ? { animationDelay: `${index * 0.05}s` } : {}}
                   >
                     <HeroCard
                       character={character}
@@ -208,7 +223,7 @@ const Index = () => {
                 ))}
               </div>
 
-              {/* Pagination */}
+              {/* Simplified pagination for mobile */}
               {totalPages > 1 && (
                 <div className="flex items-center justify-center space-x-4">
                   <Button
